@@ -15,6 +15,8 @@ any errors encountered.
 
    > ./pull.sh
 
+   > ./push.sh
+
 3) [Optional] Verify the json files.
 
    > ./checkjson.py

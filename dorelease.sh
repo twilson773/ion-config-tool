@@ -20,6 +20,7 @@ rel=/tmp/release
 /bin/rm -R $rel
 /bin/rm -R /tmp/ionconfig-*  # prior versioned releases
 mkdir $rel
+mkdir tars
 
 echo "Adding standard release files."
 cp release.json  $rel

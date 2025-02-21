@@ -39,7 +39,7 @@ const df  = require('date-fns');
 const buf = require('buffer');
 const zip = require('jszip');
 
-var debugFlag = false
+var debugFlag = true
 
 // schema imports (global)
 const configTypes = require('../../json/configTypes.json');
@@ -986,7 +986,8 @@ function makeCmdLines(configKey) {
 function makeStartLines(nodeKey) {
   // build the start script text lines for a node
   let node = nodes[nodeKey];
-  let fileName = "start_" + nodeKey + ".sh";
+  // let fileName = "start_" + nodeKey + ".sh";
+  let fileName = "start.sh";
   let nodeLabel = "ipn:" + node.ionNodeNum;
   const fileDate = getNow();
   var cmdLines = [];
@@ -1035,9 +1036,13 @@ function makeStartLines(nodeKey) {
   }
   cmdLines.push('echo "Startup of ION node ' + nodeLabel + ' on $host complete!"');
   let nodeId = node.ionNodeNum;
-  cmdLines.push('echo "Starting bpecho on ipn:' + nodeId + '.3."');
-  cmdLines.push('bpecho   ipn:' + nodeId + '.3 &');
-  return cmdLines;
+  cmdLines.push('echo "Starting bpecho on ipn:' + nodeId + '.1."');
+  cmdLines.push('bpecho   ipn:' + nodeId + '.1 &');
+  cmdLines.push('echo "Starting bpsink on ipn:' + nodeId + '.2."');
+  cmdLines.push('bpsink   ipn:' + nodeId + '.2 &');
+  cmdLines.push('echo "Starting bprecvfile on ipn:' + nodeId + '.3."');
+  cmdLines.push('bprecvfile  ipn:' + nodeId + '.3 &');
+    return cmdLines;
 }
 // NOTE: compare to makeParamNote of IonConfig IonModel.jsx
 function makeParamNote(pTypeKey,pIdx,paramVal) {
@@ -1119,7 +1124,8 @@ function saveAllConfigs() {
     catch (err)
       { console.log(err); }
     // ... and build start scripts for each node
-    let startName = "start_" + nodeKey + ".sh";
+    // let startName = "start_" + nodeKey + ".sh";
+    let startName = "start.sh";
     console.log("Saving start file: " + startName);
     let cmdLines = makeStartLines(nodeKey);
     let page = cmdLines.join(lf) + lf;

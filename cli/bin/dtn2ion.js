@@ -683,8 +683,10 @@ function buildIonModel(netName, netDesc, netHosts, netNodes, netHops) {
         nextPort++;
       var linkName  = toHostKey + ":" + nextPort;
       if (netHop.ltpLayer === "udp") {
-        if (startUdpKeys.hasOwnProperty(configName) )  // already have start udp?
-          break;                                       // one is the limit
+        if (startUdpKeys.hasOwnProperty(configName) ){  // already have start udp?
+          debug("!!!!! skipping start_udp: " + configName + " " + JSON.stringify(startUdpKeys));
+          continue;
+        }
         vals = [toAddr,nextPort];
         cmdKey = makeIonCommand(commands,clones,nodeKey,configName,"ltprc","start_udp",vals);
         startUdpKeys[configName] = cmdKey;
@@ -796,7 +798,7 @@ function buildIonModel(netName, netDesc, netHosts, netNodes, netHops) {
     } else 
     if (isStandardProtocol(bpLayer)) {
       cloneVal = getNodeOutduct(clones,nodeKey,toAddr,bpLayer);
-      //debug ("???? cloneVal: " + JSON.stringify(cloneVal));
+      debug ("???? cloneVal: " + JSON.stringify(cloneVal));
       outductName = cloneVal.value;
     };
     // build attach outduct command
@@ -1220,7 +1222,7 @@ function getNodeInduct(cloneVals,nodeKey,bpLayer) {
   var cloneType = bpLayer + "Induct";
   for (var key in cloneVals) {
     let cloneVal = cloneVals[key];
-    //debug(" checking cloneVal: " + JSON.stringify(cloneVal));
+    debug(" checking cloneVal: " + JSON.stringify(cloneVal));
     if (cloneVal.type=== cloneType && cloneVal.nodeKey === nodeKey) {
       return cloneVal;
     }
@@ -1235,7 +1237,7 @@ function getNodeLink(cloneVals,nodeKey,ltpLayer) {
   var cloneType = ltpLayer + "Link";
   for (var key in cloneVals) {
     let cloneVal = cloneVals[key];
-    //debug(" checking cloneVal: " + JSON.stringify(cloneVal));
+    debug(" checking cloneVal: " + JSON.stringify(cloneVal));
     if (cloneVal.type=== cloneType && cloneVal.nodeKey === nodeKey) {
       return cloneVal;
     }

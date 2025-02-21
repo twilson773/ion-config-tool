@@ -15,7 +15,7 @@ import json
 from operator import itemgetter
 
 # track counts of error messages by json file type
-msgCnt  = { "confgiTypes":0, "cmdTypes":0, "patterns":0, "paramTypes":0 }
+msgCnt  = { "configTypes":0, "cmdTypes":0, "patterns":0, "paramTypes":0 }
 msgFile = open("errors.log","w")
 
 def logMsg(file,type,msg):

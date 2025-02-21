@@ -51,7 +51,7 @@ description in DORELEASE.
 
    The source code is in ./editor/src.  The final "executable" is found in ./build/index.html.
 
-   The executable index.html & support files are built with the script ./editor/make.sh.
+   The executable index.html & support files are built with the script ./editor/make.sh. (cd into editor)
 
 
 6) Update the IonConfig Editor Manual.

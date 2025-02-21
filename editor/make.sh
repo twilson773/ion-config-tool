@@ -19,7 +19,7 @@ toolver=$(./toolver.py)
 echo 'Fixing the version in App.jsx'
 echo 'WAS:'
 grep "Configuration Editor" src/App.jsx
-sed -i ""  "s/Editor.*<\/h3>/Editor  $toolver<\/h3>/" src/App.jsx
+sed -i "s/Editor.*<\/h3>/Editor  $toolver<\/h3>/" src/App.jsx
 echo 'IS:'
 grep "Configuration Editor" src/App.jsx
 
@@ -29,9 +29,9 @@ npm run build
 
 echo 'Editing the index.html'
 #  Fix the subdirectory references to be relative
-sed -i "" 's/\/static/.\/static/g' build/index.html
+sed -i 's/\/static/.\/static/g' build/index.html
 #
 #  Change the browser tab title to the tool name & version
-sed -i ""  "s/React App/IonConfig $toolver/" build/index.html
+sed -i "s/React App/IonConfig $toolver/" build/index.html
 
 echo 'Done.'
