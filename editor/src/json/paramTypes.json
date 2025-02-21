@@ -1695,7 +1695,7 @@
     "valType":  "select",
     "showDefault": true,
     "units":  "",
-    "defaultValue":  "x"
+    "defaultValue":  "q"
   },
   "bpv7rc_endpoint_p3" : {
     "id" :  "bpv7rc_endpoint_p3",
