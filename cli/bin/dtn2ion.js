@@ -514,7 +514,7 @@ function buildIonModel(netName, netDesc, netHosts, netNodes, netHops) {
     addCommandKey(configs,configName,cmdKey);
     // build bpv7rc "low" endpoint cmds  [0...6]
     for (var i=0; i<7; i++) {
-      vals = [nodeNum,i,"x",""];
+      vals = [nodeNum,i,"q",""];
       cmdKey = makeIonCommand(commands,clones,nodeKey,configName,"bpv7rc","endpoint",vals);
       addCommandKey(configs,configName,cmdKey);
     }
