@@ -338,7 +338,8 @@ function extractConfigs(groupKey,configsObj) {
   var keyList = [];  // save generated keys for caller
   for (var configType in configsObj) {   // object names are configTypes
     debug_log("loop for configType:" + configType);
-    var configKey = groupKey + "." + configType;
+    // var configKey = groupKey + "." + configType;
+    var configKey = configType;
     if (configType === "contacts")   // special case for ionrc used for contacts
       configKey = groupKey + ".cg";
     keyList.push(configKey);    // save for caller
@@ -1110,7 +1111,7 @@ function saveAllConfigs() {
       console.log("Saving config file: " + configKey);
       const cmdLines = makeCmdLines(configKey);
       const page = cmdLines.join(lf) + lf;
-      var configFile = ion.name + '/' + node.id + '/' + configKey;
+      var configFile = ion.name + '/' + node.id + '/' + configKey.replace("v7", "");
       try 
         { fs.writeFileSync(configFile,page); }
       catch (err)
