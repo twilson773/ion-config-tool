@@ -1025,7 +1025,7 @@ function makeStartLines(nodeKey) {
       cmdLines.push('echo "Starting ION node ' + nodeLabel + ' on $host from $wdir"');
     else
       cmdLines.push("sleep  1");
-    cmdLines.push(prog + "  " + configKey);
+    cmdLines.push(prog + "  " + configKey.replace("v7",""));
   }
   // special case for (global) graphs file
   let contacts = ion.currentContacts;
