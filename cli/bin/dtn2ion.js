@@ -23,7 +23,7 @@ const fs = require('fs');
 const df = require('date-fns');
 const buf = require('buffer');
 
-var debugFlag = false
+var debugFlag = true
 
 // schema imports (global)
 const configTypes = require('../../json/configTypes.json');

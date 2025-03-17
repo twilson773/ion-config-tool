@@ -61,7 +61,7 @@ var hosts = {};
 var ipaddrs = {};
 var cloneValues = {}
 
-var DEBUG_MODE = false;  // No debug messages to the console is default.
+var DEBUG_MODE = true;  // No debug messages to the console is default.
 
 var watchables = ["all", "cfdp", "ltp", "bp", "bssp", "dtpc"];
 // watch flag initialization, passed in on command line
@@ -265,7 +265,7 @@ function extractIonModel (modelObj) {
     cloneVal = makeCloneVal(nodeKey,cmdObj);
     cloneValues[nodeCmdKey] = cloneVal;
 
-    debug_log("node item=" + JSON.stringify(nodeObj) );
+    debug_log("node item=" + JSON.stringify(nodeObj, null, 2) );
     var configsObj = nodeObj.configs;
 
     // check for watch flags requested on the command line
@@ -276,7 +276,7 @@ function extractIonModel (modelObj) {
       }
     }
 
-    debug_log("node configs=" + JSON.stringify(configsObj) );
+    debug_log("node configs=" + JSON.stringify(configsObj, null, 2) );
     const configKeyList = extractConfigs(nodeKey,configsObj);
     debug_log("Node got configKeys: " + configKeyList);
     nodes[nodeKey].configKeys = configKeyList;
@@ -325,6 +325,7 @@ function extractIonModel (modelObj) {
     graphs[graphKey].configKey = configKeyList[0];   // assuming just one
   }
   assignClones();   // analyze full new command set for cloneVal dependents
+  debug_log("*****end of extractIonModel");  
   return true;
 };
 
@@ -338,8 +339,8 @@ function extractConfigs(groupKey,configsObj) {
   var keyList = [];  // save generated keys for caller
   for (var configType in configsObj) {   // object names are configTypes
     debug_log("loop for configType:" + configType);
-    // var configKey = groupKey + "." + configType;
-    var configKey = configType;
+    var configKey = groupKey + "." + configType;
+    // var configKey = configType;
     if (configType === "contacts")   // special case for ionrc used for contacts
       configKey = groupKey + ".cg";
     keyList.push(configKey);    // save for caller
@@ -386,7 +387,7 @@ function extractCommands(groupKey,configType,configKey,commandsList) {
       "lastUpdate" : cmdObj.lastUpdate,
       "values" : []
     };
-    //debug_log("command item=" + JSON.stringify(commands[cmdKey]) );
+    debug_log("command item=" + JSON.stringify(commands[cmdKey], null, 2) );
     for (var j = 0; j < cmdObj.parameters.length; j++) {
       const pVal = cmdObj.parameters[j];
       commands[cmdKey].values.push(pVal);
@@ -414,6 +415,8 @@ function assignClones() {
     let cmdTypeKey = cmd.typeKey;
     debug_log("$$$ cmdKey: " + cmdKey + " has type: " + cmdTypeKey);
     let cmdType = cmdTypes[cmd.typeKey];
+    debug_log("$$$ cmdType " + JSON.stringify(cmdType, null, 2));
+    debug_log("$$$ cmd " + JSON.stringify(cmd, null, 2));
     if(cmdType.copyClone  || cmdType.pickClone) {
       for (let i = 0; i < cmdType.paramTypes.length; i++) {
          let paramTypeKey = cmdType.paramTypes[i];
@@ -434,6 +437,7 @@ function assignClones() {
       }
     }
   }
+  debug_log ("$$$ end of assignClones");
 };
 // NOTE: compare to checkModel of IonConfig IonModel.jsx
 function checkIonModel() {
@@ -460,6 +464,7 @@ function checkIonModel() {
   // host loop
   for (var hostKey in hosts) {
     const host = hosts[hostKey];
+    debug_log("checkIonModel...hosts/ip check" + hostKey)
     if (host.ipAddrKeys.length === 0) {
       let msg = "has no IP addresses defined.";
       alerts.push({"type": "Host", "name": hostKey, "level":"warn", "msg": msg});
@@ -468,6 +473,7 @@ function checkIonModel() {
   // node loop
   for (var nodeKey in nodes) {
     const node = nodes[nodeKey];
+    debug_log("checkIonModel...node loop: " + nodeKey)
     if (node.hostKey === "") {
       let msg = "has no host machine assigned.";
       alerts.push({"type": "Node", "name": nodeKey, "level":"warn", "msg": msg});
@@ -487,6 +493,7 @@ function checkIonModel() {
       }
       if (missing) {
         let msg = "Has no " + chkConf + " file.";
+        debug_log("checkIonModel: ", msg);
         alerts.push({"type": "Node", "name": nodeKey, "level":"warn", "msg": msg});
       }
     }
@@ -889,7 +896,7 @@ function getIonVerSeqNo(nodeKey) {
   var ver = 0;
   if (nodeKey in nodes) {
     const node = nodes[nodeKey];
-    debug_log("??? node: " + JSON.stringify(node));
+    debug_log("??? node: " + JSON.stringify(node, null, 2));
     ver = node.ionVersion;
   } else {
     const graph = graphs[nodeKey];
@@ -917,6 +924,11 @@ function makeCmdLine(cmdTypeKey,cmdParams) {
       continue;
     }
     let paramType = paramTypes[paramTypeKey];
+    //hack for nodeless filenames
+    if(cmdParams[i].toString().includes("ionconfig") ){
+      var n = cmdParams[i].lastIndexOf('.');
+      cmdParams[i] = cmdParams[i].substring(n + 1);
+    }
     if (cmdParams[i] === "")
       if (paramType.optional)
         cmdPattern = cmdPattern.replace(targets[i],"");
@@ -925,18 +937,21 @@ function makeCmdLine(cmdTypeKey,cmdParams) {
     else
       cmdPattern = cmdPattern.replace(targets[i],cmdParams[i]);
   }
-  //debug_log("cmd Type pattern " + cmdTypeKey + " " + cmd);
+  // debug_log("cmd Type pattern " + cmdTypeKey + " " + cmd);
   return cmdPattern;
 };
 
 // NOTE: compare to makeCmdLines of IonConfig IonModel.jsx
 function makeCmdLines(configKey) {
+  debug_log("************************");
   debug_log("makeCmdLines for: " + configKey);
+  // debug_log("makeCmdLines configs: " + JSON.stringify(configs, null, 2));
+
   const configObj = configs[configKey];
   const cmdKeys = configObj.cmdKeys;
   const configTypeKey = configObj.configType;
   const configTypeObj = configTypes[configTypeKey];
-  //debug_log("makeConfigElem configType:" + JSON.stringify(configType));
+  debug_log("makeConfigElem configType:" + JSON.stringify(configObj, null, 2));
   const modelName = ion.name;
   const modelDesc = ion.desc;
   const nodeKey = configObj.nodeKey;
@@ -979,8 +994,12 @@ function makeCmdLines(configKey) {
       const val = cmdVals[j];
       cmdLines.push(makeParamNote(pTypeKey,j,val));
     }
+    makeCmdLine(cmdTypeKey,cmdVals);
     cmdLines.push(makeCmdLine(cmdTypeKey,cmdVals));
   }
+  debug_log("FILE*************************");
+  debug_log(cmdLines);
+  debug_log("FILE END*************************");
   return cmdLines;
 }
 // NOTE: compare to makeStartLines of IonConfig IonModel.jsx
@@ -1017,7 +1036,9 @@ function makeStartLines(nodeKey) {
   for (var j=0; j<nodeConfigs.length; j++) {
     let configObj = nodeConfigs[j];
     let configKey = configObj.id;
-    debug_log("makeStartLines configKey: " + configKey);
+    var tempConfigKey = configKey.replace("v7","");
+    tempConfigKey = tempConfigKey.replace(configObj.nodeKey + ".", "");
+    debug_log("makeStartLines configKey: " + tempConfigKey);
     let configTypeKey = configObj.configType;
     let configTypeObj = configTypes[configTypeKey];
     let prog = configTypeObj.program;
@@ -1025,7 +1046,7 @@ function makeStartLines(nodeKey) {
       cmdLines.push('echo "Starting ION node ' + nodeLabel + ' on $host from $wdir"');
     else
       cmdLines.push("sleep  1");
-    cmdLines.push(prog + "  " + configKey.replace("v7",""));
+    cmdLines.push(prog + "  " + tempConfigKey);  //remove v7 from bpv7rc
   }
   // special case for (global) graphs file
   let contacts = ion.currentContacts;
@@ -1108,10 +1129,13 @@ function saveAllConfigs() {
 
     for (let j=0; j<confKeys.length; j++) {
       var configKey = confKeys[j];
-      console.log("Saving config file: " + configKey);
+      console.log("Saving config file: " + configKey + " for node: " + node.id);
       const cmdLines = makeCmdLines(configKey);
+      var n = configKey.lastIndexOf('.');
+      var result = configKey.substring(n + 1);
       const page = cmdLines.join(lf) + lf;
-      var configFile = ion.name + '/' + node.id + '/' + configKey.replace("v7", "");
+      var configFile = ion.name + '/' + node.id + '/' + result.replace("v7", "");
+      // var configFile = ion.name + '/' + node.id + '/' + configKey;
       try 
         { fs.writeFileSync(configFile,page); }
       catch (err)
